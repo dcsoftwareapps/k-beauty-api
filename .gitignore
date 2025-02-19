@@ -398,3 +398,5 @@ FodyWeavers.xsd
 
 # JetBrains Rider
 *.sln.iml
+/KBeautyApi/Properties/ServiceDependencies/Fidelity-Api - Web Deploy/profile.arm.json
+/KBeautyApi/libman.json
