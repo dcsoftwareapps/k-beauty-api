@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace FidelityApi.Migrations
 {
     [DbContext(typeof(FidelityDbContext))]
-    [Migration("20240830201939_Initial")]
-    partial class Initial
+    [Migration("20250226175928_UserEmail")]
+    partial class UserEmail
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -32,6 +32,14 @@ namespace FidelityApi.Migrations
                         .HasColumnType("int");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Color1")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Color2")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -82,6 +90,10 @@ namespace FidelityApi.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
+                    b.Property<string>("Code")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -103,8 +115,9 @@ namespace FidelityApi.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<DateTime?>("DateOfBirth")
-                        .HasColumnType("datetime2");
+                    b.Property<string>("Email")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("LevelId")
                         .HasColumnType("int");
@@ -114,6 +127,9 @@ namespace FidelityApi.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<double?>("Points")
+                        .HasColumnType("float");
+
+                    b.Property<double?>("PointsToNextLevel")
                         .HasColumnType("float");
 
                     b.Property<int>("StoreId")

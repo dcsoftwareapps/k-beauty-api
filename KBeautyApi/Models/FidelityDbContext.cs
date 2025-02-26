@@ -1,6 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 
-namespace FidelityApi.Models
+namespace KBeautyApi.Models
 {
     public class FidelityDbContext : DbContext
     {

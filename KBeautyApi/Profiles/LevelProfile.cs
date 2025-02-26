@@ -1,6 +1,6 @@
 ﻿using AutoMapper;
-using FidelityApi.Dtos;
-using FidelityApi.Models;
+using KBeautyApi.Models;
+using KBeautyApi.Dtos;
 
 namespace FidelityApi.Profiles
 {

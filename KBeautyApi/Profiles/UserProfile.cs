@@ -1,14 +1,15 @@
 ﻿using AutoMapper;
-using FidelityApi.Dtos;
-using FidelityApi.Models;
+using KBeautyApi.Dtos;
+using KBeautyApi.Models;
 
-namespace FidelityApi.Profiles
+namespace KBeautyApi.Profiles
 {
     public class UserProfile : Profile
     {
         public UserProfile()
         {
-            CreateMap<User, UserDto>();
+            CreateMap<User, UserDto>().ReverseMap();
+            CreateMap<UserCreateDto, User>().ReverseMap();
         }
     }
 }

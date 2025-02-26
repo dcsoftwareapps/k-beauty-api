@@ -1,4 +1,4 @@
-﻿namespace FidelityApi.Models
+﻿namespace KBeautyApi.Models
 {
     public class Purchase
     {

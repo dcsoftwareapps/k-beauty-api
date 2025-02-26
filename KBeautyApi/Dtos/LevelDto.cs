@@ -1,4 +1,4 @@
-﻿namespace FidelityApi.Dtos
+﻿namespace KBeautyApi.Dtos
 {
     public record LevelDto
     {

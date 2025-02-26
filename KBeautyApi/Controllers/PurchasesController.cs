@@ -1,8 +1,8 @@
-﻿using FidelityApi.Models;
+﻿using KBeautyApi.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
-namespace FidelityApi.Controllers
+namespace KBeautyApi.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]

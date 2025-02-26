@@ -1,15 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
+﻿using AutoMapper;
+using KBeautyApi.Dtos;
+using KBeautyApi.Models;
+using KBeautyApi.Utilities;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using FidelityApi.Models;
-using FidelityApi.Dtos;
-using AutoMapper;
+using Microsoft.IdentityModel.Tokens;
+using System.Text.RegularExpressions;
 
-namespace FidelityApi.Controllers
+namespace KBeautyApi.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
@@ -45,81 +43,60 @@ namespace FidelityApi.Controllers
             return Ok(userDtos);
         }
 
+
         // GET: api/Users/5
-        [HttpGet("{id}")]
-        public async Task<ActionResult<User>> GetUser(int id)
+        [HttpGet("store-code/{storeCode}/email/{email}")]
+        public async Task<ActionResult<UserDto>> GetUserByEmail(string storeCode, string email)
         {
-            var user = await _context.Users.FindAsync(id);
+            var user = await _context.Users
+                .Include(x => x.Store)
+                .Include(x => x.Level)
+                .FirstOrDefaultAsync(x => x.Store != null && x.Store.Code == storeCode && x.Email == email);
 
             if (user == null)
             {
                 return NotFound();
             }
 
-            return user;
+            return _mapper.Map<UserDto>(user);
         }
 
-        // PUT: api/Users/5
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        [HttpPut("{id}")]
-        public async Task<IActionResult> PutUser(int id, User user)
-        {
-            if (id != user.Id)
-            {
-                return BadRequest();
-            }
-
-            _context.Entry(user).State = EntityState.Modified;
-
-            try
-            {
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!UserExists(id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
-            }
-
-            return NoContent();
-        }
-
-        // POST: api/Users
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
+        
         [HttpPost]
-        public async Task<ActionResult<User>> PostUser(User user)
+        public async Task<ActionResult<UserDto>> PostUser(UserCreateDto userCreateDto)
         {
-            _context.Users.Add(user);
-            await _context.SaveChangesAsync();
-
-            return CreatedAtAction("GetUser", new { id = user.Id }, user);
-        }
-
-        // DELETE: api/Users/5
-        [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteUser(int id)
-        {
-            var user = await _context.Users.FindAsync(id);
-            if (user == null)
+            var store = await _context.Stores.Include(x => x.Levels).FirstOrDefaultAsync(x => x.Code == userCreateDto.StoreCode);
+            if (store == null)
             {
-                return NotFound();
+                return ValidationProblem("Invalid Store Code");
             }
 
-            _context.Users.Remove(user);
+            if (userCreateDto.Email.IsNullOrEmpty() || !RegexUtilities.IsValidEmail(userCreateDto.Email))
+            {
+                return ValidationProblem("Invalid Email");
+            }
+
+            if (await _context.Users.Include(x => x.Store).AnyAsync(x => x.Store != null && x.Store.Code == userCreateDto.StoreCode && x.Email == userCreateDto.Email))
+            {
+                return ValidationProblem("Email already in use");
+            }
+
+            var user = _mapper.Map<User>(userCreateDto);
+            
+            user.Code = Guid.NewGuid().ToString();
+            user.StoreId = store.Id;
+
+            var level = store?.Levels?.OrderBy(x => x.RequiredPoints).FirstOrDefault();
+            user.LevelId = level.Id;
+            user.Points = 0;
+            user.PointsToNextLevel = level.RequiredPoints;
+
+            _context.Users.Add(user);
+            
             await _context.SaveChangesAsync();
 
-            return NoContent();
+            return _mapper.Map<UserDto>(user);
         }
 
-        private bool UserExists(int id)
-        {
-            return _context.Users.Any(e => e.Id == id);
-        }
     }
 }
